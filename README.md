@@ -13,7 +13,7 @@ Simple PHP wrapper for Pixanay's API, using `file_get_contents` and streams
     $pixabay->setMinWidth(1600);
     $pixabay->setPhotosPerPage(100);
     $pixabay->setHD(true);
-    $photos = $pixabay->query($_GET['query']);
+    $photos = $pixabay->query('elephants');
     print_r($photos);
     exit(0);
 
