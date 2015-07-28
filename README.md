@@ -1,6 +1,6 @@
 # PHP-Pixabay
 
-Simple PHP wrapper for Pixanay's API, using `file_get_contents` and streams
+Simple PHP wrapper for Pixabay's API, using `file_get_contents` and streams
 
 ### Sample Call
 
