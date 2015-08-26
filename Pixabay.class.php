@@ -216,9 +216,7 @@
             if ($response === false) {
                 return false;
             }
-            return $this->_associative
-                ? $response['hits']
-                : $response->hits;
+            return $response;
         }
 
         /**
