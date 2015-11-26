@@ -165,7 +165,8 @@
             }
 
             // Fail
-            error_log($response);
+            error_log('Pixabay failed response');
+            // error_log($response);
             return false;
         }
 
