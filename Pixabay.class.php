@@ -92,28 +92,15 @@
         protected $_type = 'photo';
 
         /**
-         * _username
-         * 
-         * @var    string
-         * @access protected
-         */
-        protected $_username;
-
-        /**
          * __construct
          * 
          * @access public
-         * @param  string $username
          * @param  string $key
          * @param  boolean $associative (default: true)
          * @return void
          */
-        public function __construct(
-            $username,
-            $key,
-            $associative = true
-        ) {
-            $this->_username = $username;
+        public function __construct($key, $associative = true)
+        {
             $this->_key = $key;
             $this->_associative = $associative;
         }
@@ -134,7 +121,6 @@
             }
             $args = array_merge(
                 array(
-                    'username' => $this->_username,
                     'key' => $this->_key,
                     'response_group' => $responseGroup,
                 ),
