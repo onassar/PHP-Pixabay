@@ -140,6 +140,7 @@
             // Make the request
             $context = stream_context_create($opts);
             $response = file_get_contents($url, false, $context);
+            $headers = $this->_getRateLimits($http_response_header);
 
             // Attempt request; fail with false if it bails
             json_decode($response);
@@ -154,6 +155,41 @@
             error_log('Pixabay failed response');
             // error_log($response);
             return false;
+        }
+
+        /**
+         * _getRateLimits
+         * 
+         * @see    http://php.net/manual/en/reserved.variables.httpresponseheader.php
+         * @access protected
+         * @param  array $http_response_header
+         * @return array
+         */
+        public function _getRateLimits(array $http_response_header)
+        {
+            $headers = $http_response_header;
+            $formatted = array();
+            foreach ($headers as $header) {
+                $pieces = explode(':', $header);
+                if (count($pieces) >= 2) {
+                    $formatted[$pieces[0]] = $pieces[1];
+                }
+            }
+            $rate = array(
+                'remaining' => false,
+                'limit' => false,
+                'reset' => false
+            );
+            if (isset($formatted['X-RateLimit-Remaining']) === true) {
+                $rate['remaining'] = $formatted['X-RateLimit-Remaining'];
+            }
+            if (isset($formatted['X-RateLimit-Limit']) === true) {
+                $rate['limit'] = $formatted['X-RateLimit-Limit'];
+            }
+            if (isset($formatted['X-RateLimit-Reset']) === true) {
+                $rate['reset'] = $formatted['X-RateLimit-Reset'];
+            }
+            return $rate;
         }
 
         /**
