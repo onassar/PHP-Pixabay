@@ -239,6 +239,17 @@
             if ($response === false) {
                 return false;
             }
+
+            // Add original query
+            if ($this->_associative === true) {
+                foreach ($response['hits'] as $index => $hit) {
+                    $response['hits'][$index]['original_query'] = $query;
+                }
+            } else {
+                foreach ($response->hits as $index => $hit) {
+                    $response->hits[$index]->original_query = $query;
+                }
+            }
             return $response;
         }
 
