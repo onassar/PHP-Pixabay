@@ -140,7 +140,7 @@
             // Make the request
             $context = stream_context_create($opts);
             $response = file_get_contents($url, false, $context);
-            $headers = $this->_getRateLimits($http_response_header);
+            $limits = $this->_getRateLimits($http_response_header);
 
             // Attempt request; fail with false if it bails
             json_decode($response);
