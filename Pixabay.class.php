@@ -181,13 +181,13 @@
                 'reset' => false
             );
             if (isset($formatted['X-RateLimit-Remaining']) === true) {
-                $rate['remaining'] = $formatted['X-RateLimit-Remaining'];
+                $rate['remaining'] = (int) $formatted['X-RateLimit-Remaining'];
             }
             if (isset($formatted['X-RateLimit-Limit']) === true) {
-                $rate['limit'] = $formatted['X-RateLimit-Limit'];
+                $rate['limit'] = (int) $formatted['X-RateLimit-Limit'];
             }
             if (isset($formatted['X-RateLimit-Reset']) === true) {
-                $rate['reset'] = $formatted['X-RateLimit-Reset'];
+                $rate['reset'] = (int) $formatted['X-RateLimit-Reset'];
             }
             return $rate;
         }
