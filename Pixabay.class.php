@@ -227,6 +227,7 @@
                 array(
                     'q' => $query,
                     'order' => $this->_order,
+                    'safesearch' => 'true',
                     'page' => $this->_page,
                     'per_page' => $this->_photosPerPage,
                     'image_type' => $this->_type,
