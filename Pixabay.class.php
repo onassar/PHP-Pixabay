@@ -5,99 +5,99 @@
      * 
      * PHP wrapper for Pixabay
      * 
-     * @author Oliver Nassar <onassar@gmail.com>
-     * @see    https://github.com/onassar/PHP-Pixabay
-     * @see    https://pixabay.com/api/docs/
+     * @link    https://pixabay.com/api/docs/
+     * @link    https://github.com/onassar/PHP-Pixabay
+     * @author  Oliver Nassar <onassar@gmail.com>
      */
     class Pixabay
     {
         /**
          * _associative
          * 
-         * @var    boolean
-         * @access protected
+         * @var     boolean
+         * @access  protected
          */
         protected $_associative;
 
         /**
          * _base
          * 
-         * @var    string
-         * @access protected
+         * @var     string
+         * @access  protected
          */
         protected $_base = 'https://pixabay.com/api/';
 
         /**
          * _hd
          * 
-         * @var    boolean (default: false)
-         * @access protected
+         * @var     boolean (default: false)
+         * @access  protected
          */
         protected $_hd = false;
 
         /**
          * _key
          * 
-         * @var    string
-         * @access protected
+         * @var     string
+         * @access  protected
          */
         protected $_key;
 
         /**
          * _minHeight
          * 
-         * @var    string (default: '0')
-         * @access protected
+         * @var     string (default: '0')
+         * @access  protected
          */
         protected $_minHeight = '0';
 
         /**
          * _minWidth
          * 
-         * @var    string (default: '0')
-         * @access protected
+         * @var     string (default: '0')
+         * @access  protected
          */
         protected $_minWidth = '0';
 
         /**
          * _order
          * 
-         * @var    string (default: 'popular')
-         * @access protected
+         * @var     string (default: 'popular')
+         * @access  protected
          */
         protected $_order = 'popular';
 
         /**
          * _page
          * 
-         * @var    string (default: '1')
-         * @access protected
+         * @var     string (default: '1')
+         * @access  protected
          */
         protected $_page = '1';
 
         /**
          * _photosPerPage
          * 
-         * @var    string (default: '20')
-         * @access protected
+         * @var     string (default: '20')
+         * @access  protected
          */
         protected $_photosPerPage = '20';
 
         /**
          * _type
          * 
-         * @var    string (default: 'photo')
-         * @access protected
+         * @var     string (default: 'photo')
+         * @access  protected
          */
         protected $_type = 'photo';
 
         /**
          * __construct
          * 
-         * @access public
-         * @param  string $key
-         * @param  boolean $associative (default: true)
-         * @return void
+         * @access  public
+         * @param   string $key
+         * @param   boolean $associative (default: true)
+         * @return  void
          */
         public function __construct($key, $associative = true)
         {
@@ -108,9 +108,9 @@
         /**
          * _get
          * 
-         * @access protected
-         * @param  array $args
-         * @return false|array|stdClass
+         * @access  protected
+         * @param   array $args
+         * @return  false|array|stdClass
          */
         public function _get(array $args)
         {
@@ -160,10 +160,10 @@
         /**
          * _getRateLimits
          * 
-         * @see    http://php.net/manual/en/reserved.variables.httpresponseheader.php
-         * @access protected
-         * @param  array $http_response_header
-         * @return array
+         * @see     http://php.net/manual/en/reserved.variables.httpresponseheader.php
+         * @access  protected
+         * @param   array $http_response_header
+         * @return  array
          */
         public function _getRateLimits(array $http_response_header)
         {
@@ -195,9 +195,9 @@
         /**
          * id
          * 
-         * @access public
-         * @param  string $id
-         * @return false|array|stdClass
+         * @access  public
+         * @param   string $id
+         * @return  false|array|stdClass
          */
         public function id($id)
         {
@@ -216,10 +216,10 @@
         /**
          * query
          * 
-         * @access public
-         * @param  string $query
-         * @param  array $args (default: array())
-         * @return false|array|stdClass
+         * @access  public
+         * @param   string $query
+         * @param   array $args (default: array())
+         * @return  false|array|stdClass
          */
         public function query($query, array $args = array())
         {
@@ -257,9 +257,9 @@
         /**
          * setHD
          * 
-         * @access public
-         * @param  boolean $hd
-         * @return void
+         * @access  public
+         * @param   boolean $hd
+         * @return  void
          */
         public function setHD($hd)
         {
@@ -269,9 +269,9 @@
         /**
          * setMinHeight
          * 
-         * @access public
-         * @param  string $minHeight
-         * @return void
+         * @access  public
+         * @param   string $minHeight
+         * @return  void
          */
         public function setMinHeight($minHeight)
         {
@@ -281,9 +281,9 @@
         /**
          * setMinWidth
          * 
-         * @access public
-         * @param  string $minWidth
-         * @return void
+         * @access  public
+         * @param   string $minWidth
+         * @return  void
          */
         public function setMinWidth($minWidth)
         {
@@ -293,9 +293,9 @@
         /**
          * setOrder
          * 
-         * @access public
-         * @param  string $order
-         * @return void
+         * @access  public
+         * @param   string $order
+         * @return  void
          */
         public function setOrder($order)
         {
@@ -305,9 +305,9 @@
         /**
          * setPage
          * 
-         * @access public
-         * @param  string $page
-         * @return void
+         * @access  public
+         * @param   string $page
+         * @return  void
          */
         public function setPage($page)
         {
@@ -317,9 +317,9 @@
         /**
          * setPhotosPerPage
          * 
-         * @access public
-         * @param  string $photosPerPage
-         * @return void
+         * @access  public
+         * @param   string $photosPerPage
+         * @return  void
          */
         public function setPhotosPerPage($photosPerPage)
         {
@@ -329,9 +329,9 @@
         /**
          * setType
          * 
-         * @access public
-         * @param  string $type
-         * @return void
+         * @access  public
+         * @param   string $type
+         * @return  void
          */
         public function setType($type)
         {
