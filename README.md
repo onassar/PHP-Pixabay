@@ -9,7 +9,7 @@ Simple PHP wrapper for Pixabay's API, using `file_get_contents` and streams
     require_once '/path/to/Pixabay.class.php';
     $username  = '*****';
     $key = '*****';
-    $pixabay = (new Pixabay($username, $key));
+    $pixabay = new Pixabay($username, $key);
     $pixabay->setMinWidth(1600);
     $pixabay->setPhotosPerPage(100);
     $pixabay->setHD(true);
