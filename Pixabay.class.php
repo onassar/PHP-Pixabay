@@ -12,25 +12,17 @@
     class Pixabay
     {
         /**
-         * _associative
-         * 
-         * @var     boolean
-         * @access  protected
-         */
-        protected $_associative;
-
-        /**
          * _base
          * 
-         * @var     string
+         * @var     string (default: 'https://pixabay.com/api')
          * @access  protected
          */
-        protected $_base = 'https://pixabay.com/api/';
+        protected $_base = 'https://pixabay.com/api';
 
         /**
          * _hd
          * 
-         * @var     boolean (default: false)
+         * @var     bool (default: false)
          * @access  protected
          */
         protected $_hd = false;
@@ -38,26 +30,34 @@
         /**
          * _key
          * 
-         * @var     string
+         * @var     null|string
          * @access  protected
          */
-        protected $_key;
+        protected $_key = null;
+
+        /**
+         * _lastRemoteRequestHeaders
+         * 
+         * @var     array (default: array())
+         * @access  protected
+         */
+        protected $_lastRemoteRequestHeaders = array();
 
         /**
          * _minHeight
          * 
-         * @var     string (default: '0')
+         * @var     int (default: 0)
          * @access  protected
          */
-        protected $_minHeight = '0';
+        protected $_minHeight = 0;
 
         /**
          * _minWidth
          * 
-         * @var     string (default: '0')
+         * @var     int (default: 0)
          * @access  protected
          */
-        protected $_minWidth = '0';
+        protected $_minWidth = 0;
 
         /**
          * _order
@@ -70,18 +70,34 @@
         /**
          * _page
          * 
-         * @var     string (default: '1')
+         * @var     int (default: 1)
          * @access  protected
          */
-        protected $_page = '1';
+        protected $_page = 1;
 
         /**
          * _photosPerPage
          * 
-         * @var     string (default: '20')
+         * @var     int (default: 20)
          * @access  protected
          */
-        protected $_photosPerPage = '20';
+        protected $_photosPerPage = 20;
+
+        /**
+         * _rateLimits
+         * 
+         * @var     null|array
+         * @access  protected
+         */
+        protected $_rateLimits = null;
+
+        /**
+         * _requestTimeout
+         * 
+         * @var     int (default: 10)
+         * @access  protected
+         */
+        protected $_requestTimeout = 10;
 
         /**
          * _type
@@ -96,13 +112,69 @@
          * 
          * @access  public
          * @param   string $key
-         * @param   boolean $associative (default: true)
          * @return  void
          */
-        public function __construct($key, $associative = true)
+        public function __construct(string $key)
         {
             $this->_key = $key;
-            $this->_associative = $associative;
+        }
+
+        /**
+         * _addUrlParams
+         * 
+         * @access  protected
+         * @param   string $url
+         * @param   array $params
+         * @return  string
+         */
+        protected function _addUrlParams(string $url, array $params): string
+        {
+            $query = http_build_query($params);
+            $piece = parse_url($url, PHP_URL_QUERY);
+            if ($piece === null) {
+                $url = ($url) . '?' . ($query);
+                return $url;
+            }
+            $url = ($url) . '&' . ($query);
+            return $url;
+        }
+
+        /**
+         * _getSearchQueryData
+         * 
+         * @access  protected
+         * @param   array $args
+         * @return  array
+         */
+        protected function _getSearchQueryData(array $args): array
+        {
+            $responseGroup = 'image_details';
+            if ($this->_hd === true) {
+                $responseGroup = 'high_resolution';
+            }
+            $data = array(
+                'key' => $this->_key,
+                'response_group' => $responseGroup,
+            );
+            $data = array_merge($data, $args);
+            return $data;
+        }
+
+        /**
+         * _getSearchUrl
+         * 
+         * @access  protected
+         * @param   array $args
+         * @return  string
+         */
+        protected function _getSearchUrl(array $args): string
+        {
+            $base = $this->_base;
+            $path = '/';
+            $data = $this->_getSearchQueryData($args);
+            $url = ($base) . ($path);
+            $url = $this->_addUrlParams($url, $data);
+            return $url;
         }
 
         /**
@@ -110,51 +182,43 @@
          * 
          * @access  protected
          * @param   array $args
-         * @return  false|array|stdClass
+         * @return  null|array
          */
-        public function _get(array $args)
+        protected function _get(array $args): ?array
         {
-            // Path to request
-            $responseGroup = 'image_details';
-            if ($this->_hd === true) {
-                $responseGroup = 'high_resolution';
-            }
-            $args = array_merge(
-                array(
-                    'key' => $this->_key,
-                    'response_group' => $responseGroup,
-                ),
-                $args
-            );
-            $path = http_build_query($args);
-            $url = ($this->_base) . '?' . ($path);
-
-            // Stream (to ignore 400 errors)
-            $opts = array(
-                'http' => array(
-                    'method' => 'GET',
-                    'ignore_errors' => true
-                )
-            );
-
             // Make the request
-            $context = stream_context_create($opts);
-            $response = file_get_contents($url, false, $context);
-            $limits = $this->_getRateLimits($http_response_header);
+            $url = $this->_getSearchUrl($args);
+            $response = $this->_requestUrl($url);
+            if ($response === null) {
+                return null;
+            }
+            $this->_rateLimits = $this->_getRateLimits();
 
-            // Attempt request; fail with false if it bails
+            // Invalid json response
             json_decode($response);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                return json_decode(
-                    $response,
-                    $this->_associative
-                );
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return null;
             }
 
-            // Fail
-            // error_log('Pixabay:    failed response');
-            // error_log($response);
-            return false;
+            // Response formatting
+            $response = json_decode($response, true);
+            return $response;
+        }
+
+        /**
+         * _getFormattedSearchResponse
+         * 
+         * @access  protected
+         * @param   string $query
+         * @param   array $response
+         * @return  array
+         */
+        protected function _getFormattedSearchResponse(string $query, array $response): array
+        {
+            foreach ($response['hits'] as $index => $hit) {
+                $response['hits'][$index]['original_query'] = $query;
+            }
+            return $response;
         }
 
         /**
@@ -162,12 +226,14 @@
          * 
          * @see     http://php.net/manual/en/reserved.variables.httpresponseheader.php
          * @access  protected
-         * @param   array $http_response_header
-         * @return  array
+         * @return  null|array
          */
-        public function _getRateLimits(array $http_response_header)
+        protected function _getRateLimits(): ?array
         {
-            $headers = $http_response_header;
+            $headers = $this->_lastRemoteRequestHeaders;
+            if ($headers === null) {
+                return null;
+            }
             $formatted = array();
             foreach ($headers as $header) {
                 $pieces = explode(':', $header);
@@ -175,82 +241,117 @@
                     $formatted[$pieces[0]] = $pieces[1];
                 }
             }
-            $rate = array(
+            $rateLimits = array(
                 'remaining' => false,
                 'limit' => false,
                 'reset' => false
             );
             if (isset($formatted['X-RateLimit-Remaining']) === true) {
-                $rate['remaining'] = (int) $formatted['X-RateLimit-Remaining'];
+                $rateLimits['remaining'] = (int) trim($formatted['X-RateLimit-Remaining']);
             }
             if (isset($formatted['X-RateLimit-Limit']) === true) {
-                $rate['limit'] = (int) $formatted['X-RateLimit-Limit'];
+                $rateLimits['limit'] = (int) trim($formatted['X-RateLimit-Limit']);
             }
             if (isset($formatted['X-RateLimit-Reset']) === true) {
-                $rate['reset'] = (int) $formatted['X-RateLimit-Reset'];
+                $rateLimits['reset'] = (int) trim($formatted['X-RateLimit-Reset']);
             }
-            return $rate;
+            return $rateLimits;
         }
 
         /**
-         * id
+         * _getRequestArguments
+         * 
+         * @access  protected
+         * @param   string $query
+         * @param   array $args (default: array())
+         * @return  array
+         */
+        protected function _getRequestArguments(string $query, array $args = array()): array
+        {
+            $defaults = array(
+                'q' => $query,
+                'order' => $this->_order,
+                'safesearch' => 'true',
+                'page' => $this->_page,
+                'per_page' => $this->_photosPerPage,
+                'image_type' => $this->_type,
+                'min_width' => $this->_minWidth,
+                'min_height' => $this->_minHeight
+            );
+            $args = array_merge($defaults, $args);
+            return $args;
+        }
+
+        /**
+         * _getRequestStreamContext
+         * 
+         * @access  protected
+         * @return  resource
+         */
+        protected function _getRequestStreamContext()
+        {
+            $requestTimeout = $this->_requestTimeout;
+            $options = array(
+                'http' => array(
+                    'ignore_errors' => true,
+                    'method' => 'GET',
+                    'timeout' => $requestTimeout
+                )
+            );
+            $streamContext = stream_context_create($options);
+            return $streamContext;
+        }
+
+        /**
+         * _requestUrl
+         * 
+         * @access  protected
+         * @param   string $url
+         * @return  null|string
+         */
+        protected function _requestUrl(string $url): ?string
+        {
+            $streamContext = $this->_getRequestStreamContext();
+            $response = file_get_contents($url, false, $streamContext);
+            if (isset($http_response_header) === true) {
+                $this->_lastRemoteRequestHeaders = $http_response_header;
+            }
+            if ($response === false) {
+                return null;
+            }
+            return $response;
+        }
+
+        /**
+         * getRateLimits
          * 
          * @access  public
-         * @param   string $id
-         * @return  false|array|stdClass
+         * @return  null|array
          */
-        public function id($id)
+        public function getRateLimits(): ?array
         {
-            $args = array(
-                'id' => $id
-            );
-            $response = $this->_get($args);
-            if ($response === false) {
-                return false;
-            }
-            return $this->_associative
-                ? $response['hits'][0]
-                : $response->hits[0];
+            return $this->_rateLimits;
         }
 
         /**
-         * query
+         * search
          * 
          * @access  public
          * @param   string $query
          * @param   array $args (default: array())
-         * @return  false|array|stdClass
+         * @return  null|array
          */
-        public function query($query, array $args = array())
+        public function search(string $query, array $args = array()): ?array
         {
-            $args = array_merge(
-                array(
-                    'q' => $query,
-                    'order' => $this->_order,
-                    'safesearch' => 'true',
-                    'page' => $this->_page,
-                    'per_page' => $this->_photosPerPage,
-                    'image_type' => $this->_type,
-                    'min_width' => $this->_minWidth,
-                    'min_height' => $this->_minHeight
-                ),
-                $args
-            );
+            $args = $this->_getRequestArguments($query, $args);
             $response = $this->_get($args);
-            if ($response === false) {
-                return false;
+            if ($response === null) {
+                return null;
             }
-
-            // Add original query
-            if ($this->_associative === true) {
-                foreach ($response['hits'] as $index => $hit) {
-                    $response['hits'][$index]['original_query'] = $query;
-                }
-            } else {
-                foreach ($response->hits as $index => $hit) {
-                    $response->hits[$index]->original_query = $query;
-                }
+            if (isset($response['hits']) === false) {
+                return null;
             }
+            $response = $this->_getFormattedSearchResponse($query, $response);
             return $response;
         }
 
@@ -258,10 +359,10 @@
          * setHD
          * 
          * @access  public
-         * @param   boolean $hd
+         * @param   bool $hd
          * @return  void
          */
-        public function setHD($hd)
+        public function setHD(bool $hd): void
         {
             $this->_hd = $hd;
         }
@@ -270,10 +371,10 @@
          * setMinHeight
          * 
          * @access  public
-         * @param   string $minHeight
+         * @param   int $minHeight
          * @return  void
          */
-        public function setMinHeight($minHeight)
+        public function setMinHeight(int $minHeight): void
         {
             $this->_minHeight = $minHeight;
         }
@@ -282,10 +383,10 @@
          * setMinWidth
          * 
          * @access  public
-         * @param   string $minWidth
+         * @param   int $minWidth
          * @return  void
          */
-        public function setMinWidth($minWidth)
+        public function setMinWidth(int $minWidth): void
         {
             $this->_minWidth = $minWidth;
         }
@@ -297,7 +398,7 @@
          * @param   string $order
          * @return  void
          */
-        public function setOrder($order)
+        public function setOrder(string $order): void
         {
             $this->_order = $order;
         }
@@ -306,10 +407,10 @@
          * setPage
          * 
          * @access  public
-         * @param   string $page
+         * @param   int $page
          * @return  void
          */
-        public function setPage($page)
+        public function setPage(int $page): void
         {
             $this->_page = $page;
         }
@@ -318,10 +419,10 @@
          * setPhotosPerPage
          * 
          * @access  public
-         * @param   string $photosPerPage
+         * @param   int $photosPerPage
          * @return  void
          */
-        public function setPhotosPerPage($photosPerPage)
+        public function setPhotosPerPage(int $photosPerPage): void
         {
             $this->_photosPerPage = $photosPerPage;
         }
@@ -333,7 +434,7 @@
          * @param   string $type
          * @return  void
          */
-        public function setType($type)
+        public function setType(string $type): void
         {
             $this->_type = $type;
         }
