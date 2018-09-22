@@ -44,6 +44,14 @@
         protected $_lastRemoteRequestHeaders = array();
 
         /**
+         * _maxPerPage
+         * 
+         * @var     int (default: 200)
+         * @access  protected
+         */
+        protected $_maxPerPage = 200;
+
+        /**
          * _minHeight
          * 
          * @var     int (default: 0)
