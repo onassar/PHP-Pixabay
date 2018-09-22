@@ -28,6 +28,14 @@
         protected $_hd = false;
 
         /**
+         * _imageType
+         * 
+         * @var     string (default: 'photo')
+         * @access  protected
+         */
+        protected $_imageType = 'photo';
+
+        /**
          * _key
          * 
          * @var     null|string
@@ -42,6 +50,14 @@
          * @access  protected
          */
         protected $_lastRemoteRequestHeaders = array();
+
+        /**
+         * _limit
+         * 
+         * @var     int (default: 200)
+         * @access  protected
+         */
+        protected $_limit = 200;
 
         /**
          * _maxPerPage
@@ -60,6 +76,14 @@
         protected $_minHeight = 0;
 
         /**
+         * _minPerPage
+         * 
+         * @var     int (default: 3)
+         * @access  protected
+         */
+        protected $_minPerPage = 3;
+
+        /**
          * _minWidth
          * 
          * @var     int (default: 0)
@@ -76,20 +100,14 @@
         protected $_order = 'popular';
 
         /**
-         * _page
+         * _paths
          * 
-         * @var     int (default: 1)
+         * @var     array
          * @access  protected
          */
-        protected $_page = 1;
-
-        /**
-         * _photosPerPage
-         * 
-         * @var     int (default: 20)
-         * @access  protected
-         */
-        protected $_photosPerPage = 20;
+        protected $_paths = array(
+            'search' => ''
+        );
 
         /**
          * _rateLimits
@@ -106,14 +124,6 @@
          * @access  protected
          */
         protected $_requestTimeout = 10;
-
-        /**
-         * _type
-         * 
-         * @var     string (default: 'photo')
-         * @access  protected
-         */
-        protected $_type = 'photo';
 
         /**
          * __construct
@@ -148,54 +158,16 @@
         }
 
         /**
-         * _getSearchQueryData
-         * 
-         * @access  protected
-         * @param   array $args
-         * @return  array
-         */
-        protected function _getSearchQueryData(array $args): array
-        {
-            $responseGroup = 'image_details';
-            if ($this->_hd === true) {
-                $responseGroup = 'high_resolution';
-            }
-            $data = array(
-                'key' => $this->_key,
-                'response_group' => $responseGroup,
-            );
-            $data = array_merge($data, $args);
-            return $data;
-        }
-
-        /**
-         * _getSearchUrl
-         * 
-         * @access  protected
-         * @param   array $args
-         * @return  string
-         */
-        protected function _getSearchUrl(array $args): string
-        {
-            $base = $this->_base;
-            $path = '/';
-            $data = $this->_getSearchQueryData($args);
-            $url = ($base) . ($path);
-            $url = $this->_addUrlParams($url, $data);
-            return $url;
-        }
-
-        /**
          * _get
          * 
          * @access  protected
-         * @param   array $args
+         * @param   array $requestData
          * @return  null|array
          */
-        protected function _get(array $args): ?array
+        protected function _get(array $requestData): ?array
         {
             // Make the request
-            $url = $this->_getSearchUrl($args);
+            $url = $this->_getSearchUrl($requestData);
             $response = $this->_requestUrl($url);
             if ($response === null) {
                 return null;
@@ -223,10 +195,68 @@
          */
         protected function _getFormattedSearchResponse(string $query, array $response): array
         {
-            foreach ($response['hits'] as $index => $hit) {
-                $response['hits'][$index]['original_query'] = $query;
+            $results = $response['hits'];
+            foreach ($results as $index => $hit) {
+                $results[$index]['original_query'] = $query;
             }
-            return $response;
+            return $results;
+        }
+
+        /**
+         * _getPaginationData
+         * 
+         * @access  protected
+         * @return  array
+         */
+        protected function _getPaginationData(): array
+        {
+            $perPage = $this->_getResultsPerPage();
+            $offset = $this->_offset;
+            $offset = $this->_roundToLower($offset, $perPage);
+            $page = ceil($offset / $perPage) + 1;
+            $paginationData = array(
+                'page' => $page,
+                'per_page' => $perPage
+            );
+            return $paginationData;
+        }
+
+        /**
+         * _getQueryData
+         * 
+         * @access  protected
+         * @param   string $query
+         * @return  array
+         */
+        protected function _getQueryData(string $query): array
+        {
+            $responseGroup = 'image_details';
+            if ($this->_hd === true) {
+                $responseGroup = 'high_resolution';
+            }
+            $queryData = array(
+                'q' => $query,
+                'key' => $this->_key,
+                'response_group' => $responseGroup,
+                'order' => $this->_order,
+                'safesearch' => 'true',
+                'image_type' => $this->_imageType,
+                'min_width' => $this->_minWidth,
+                'min_height' => $this->_minHeight
+            );
+            return $queryData;
+        }
+
+        /**
+         * _getResultsPerPage
+         * 
+         * @access  protected
+         * @return  int
+         */
+        protected function _getResultsPerPage(): int
+        {
+            $resultsPerPage = min($this->_limit, $this->_maxPerPage);
+            return $resultsPerPage;
         }
 
         /**
@@ -267,27 +297,18 @@
         }
 
         /**
-         * _getRequestArguments
+         * _getRequestData
          * 
          * @access  protected
          * @param   string $query
-         * @param   array $args (default: array())
          * @return  array
          */
-        protected function _getRequestArguments(string $query, array $args = array()): array
+        protected function _getRequestData(string $query): array
         {
-            $defaults = array(
-                'q' => $query,
-                'order' => $this->_order,
-                'safesearch' => 'true',
-                'page' => $this->_page,
-                'per_page' => $this->_photosPerPage,
-                'image_type' => $this->_type,
-                'min_width' => $this->_minWidth,
-                'min_height' => $this->_minHeight
-            );
-            $args = array_merge($defaults, $args);
-            return $args;
+            $paginationData = $this->_getPaginationData();
+            $queryData = $this->_getQueryData($query);
+            $requestData = array_merge($paginationData, $queryData);
+            return $requestData;
         }
 
         /**
@@ -311,6 +332,23 @@
         }
 
         /**
+         * _getSearchUrl
+         * 
+         * @access  protected
+         * @param   array $requestData
+         * @return  string
+         */
+        protected function _getSearchUrl(array $requestData): string
+        {
+            $base = $this->_base;
+            $path = $this->_paths['search'];
+            $data = $requestData;
+            $url = ($base) . ($path);
+            $url = $this->_addUrlParams($url, $data);
+            return $url;
+        }
+
+        /**
          * _requestUrl
          * 
          * @access  protected
@@ -321,13 +359,30 @@
         {
             $streamContext = $this->_getRequestStreamContext();
             $response = file_get_contents($url, false, $streamContext);
-            if (isset($http_response_header) === true) {
-                $this->_lastRemoteRequestHeaders = $http_response_header;
-            }
             if ($response === false) {
                 return null;
             }
+            if (isset($http_response_header) === true) {
+                $this->_lastRemoteRequestHeaders = $http_response_header;
+            }
             return $response;
+        }
+
+        /**
+         * _roundToLower
+         * 
+         * @access  protected
+         * @param   int $int
+         * @param   int $interval
+         * @return  int
+         */
+        protected function _roundToLower(int $int, int $interval): int
+        {
+            $int = (string) $int;
+            $int = preg_replace('/[^0-9]/', '', $int);
+            $int = (int) $int;
+            $lowered = floor($int / $interval) * $interval;
+            return $lowered;
         }
 
         /**
@@ -338,7 +393,8 @@
          */
         public function getRateLimits(): ?array
         {
-            return $this->_rateLimits;
+            $rateLimits = $this->_rateLimits;
+            return $rateLimits;
         }
 
         /**
@@ -346,21 +402,42 @@
          * 
          * @access  public
          * @param   string $query
-         * @param   array $args (default: array())
+         * @param   array &persistent (default: array())
          * @return  null|array
          */
-        public function search(string $query, array $args = array()): ?array
+        public function search(string $query, array &$persistent = array()): ?array
         {
-            $args = $this->_getRequestArguments($query, $args);
-            $response = $this->_get($args);
+            // Request results
+            $requestData = $this->_getRequestData($query);
+            $response = $this->_get($requestData);
+
+            // Failed request
             if ($response === null) {
-                return null;
+                return array();
             }
             if (isset($response['hits']) === false) {
-                return null;
+                return array();
             }
-            $response = $this->_getFormattedSearchResponse($query, $response);
-            return $response;
+
+            // Format + more than enough found
+            $results = $this->_getFormattedSearchResponse($query, $response);
+            $resultsCount = count($results);
+            $mod = $this->_offset % $this->_getResultsPerPage();
+            if ($mod !== 0) {
+                array_splice($results, 0, $mod);
+            }
+            $persistent = array_merge($persistent, $results);
+            $persistentCount = count($persistent);
+            if ($persistentCount >= $this->_limit) {
+                return array_slice($persistent, 0, $this->_limit);
+            }
+            if ($resultsCount < $this->_maxPerPage) {
+                return array_slice($persistent, 0, $this->_limit);
+            }
+
+            // Recusively get more
+            $this->_offset += count($results);
+            return $this->search($query, $persistent);
         }
 
         /**
@@ -373,6 +450,33 @@
         public function setHD(bool $hd): void
         {
             $this->_hd = $hd;
+        }
+
+        /**
+         * setImageType
+         * 
+         * @access  public
+         * @param   string $imageType
+         * @return  void
+         */
+        public function setImageType($imageType)
+        {
+            $this->_imageType = $imageType;
+        }
+
+        /**
+         * setLimit
+         * 
+         * @access  public
+         * @param   string $limit
+         * @return  void
+         */
+        public function setLimit($limit)
+        {
+            $this->_limit = $limit;
+            if ($limit < $this->_minPerPage) {
+                $this->_limit = $this->_minPerPage;
+            }
         }
 
         /**
@@ -412,38 +516,14 @@
         }
 
         /**
-         * setPage
+         * setOffset
          * 
          * @access  public
-         * @param   int $page
+         * @param   string $offset
          * @return  void
          */
-        public function setPage(int $page): void
+        public function setOffset($offset)
         {
-            $this->_page = $page;
-        }
-
-        /**
-         * setPhotosPerPage
-         * 
-         * @access  public
-         * @param   int $photosPerPage
-         * @return  void
-         */
-        public function setPhotosPerPage(int $photosPerPage): void
-        {
-            $this->_photosPerPage = $photosPerPage;
-        }
-
-        /**
-         * setType
-         * 
-         * @access  public
-         * @param   string $type
-         * @return  void
-         */
-        public function setType(string $type): void
-        {
-            $this->_type = $type;
+            $this->_offset = $offset;
         }
     }
