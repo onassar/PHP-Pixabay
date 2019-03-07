@@ -22,10 +22,10 @@
         /**
          * _base
          * 
-         * @var     string (default: 'https://pixabay.com/api')
+         * @var     string (default: 'https://pixabay.com/api/')
          * @access  protected
          */
-        protected $_base = 'https://pixabay.com/api';
+        protected $_base = 'https://pixabay.com/api/';
 
         /**
          * _hd
