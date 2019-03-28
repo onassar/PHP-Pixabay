@@ -749,4 +749,16 @@
         {
             $this->_requestApproach = $requestApproach;
         }
+
+        /**
+         * setRequestTimeout
+         * 
+         * @access  public
+         * @param   int $requestTimeout
+         * @return  void
+         */
+        public function setRequestTimeout(int $requestTimeout): void
+        {
+            $this->_requestTimeout = $requestTimeout;
+        }
     }
