@@ -46,7 +46,7 @@
         /**
          * _key
          * 
-         * @var     null|string
+         * @var     null|string (default: null)
          * @access  protected
          */
         protected $_key = null;
