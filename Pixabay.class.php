@@ -70,7 +70,7 @@
         /**
          * _logClosure
          * 
-         * @var     null|Closure (defualt: null)
+         * @var     null|Closure (default: null)
          * @access  protected
          */
         protected $_logClosure = null;
@@ -670,7 +670,7 @@
          * @param   string $limit
          * @return  void
          */
-        public function setLimit($limit)
+        public function setLimit($limit): void
         {
             $this->_limit = $limit;
             if ($limit < $this->_minPerPage) {
@@ -685,7 +685,7 @@
          * @param   Closure $closure
          * @return  void
          */
-        public function setLogClosure(Closure $closure)
+        public function setLogClosure(Closure $closure): void
         {
             $this->_logClosure = $closure;
         }
@@ -733,7 +733,7 @@
          * @param   string $offset
          * @return  void
          */
-        public function setOffset($offset)
+        public function setOffset($offset): void
         {
             $this->_offset = $offset;
         }
