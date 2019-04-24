@@ -129,7 +129,7 @@
          * _rateLimits
          * 
          * @access  protected
-         * @var     null|array
+         * @var     null|array (default: null)
          */
         protected $_rateLimits = null;
 
