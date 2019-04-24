@@ -14,112 +14,112 @@
         /**
          * _attemptSleepDelay
          * 
-         * @var     int (default: 2000) in milliseconds
          * @access  protected
+         * @var     int (default: 2000) in milliseconds
          */
         protected $_attemptSleepDelay = 2000;
 
         /**
          * _base
          * 
-         * @var     string (default: 'https://pixabay.com/api/')
          * @access  protected
+         * @var     string (default: 'https://pixabay.com/api/')
          */
         protected $_base = 'https://pixabay.com/api/';
 
         /**
          * _hd
          * 
-         * @var     bool (default: false)
          * @access  protected
+         * @var     bool (default: false)
          */
         protected $_hd = false;
 
         /**
          * _imageType
          * 
-         * @var     string (default: 'photo')
          * @access  protected
+         * @var     string (default: 'photo')
          */
         protected $_imageType = 'photo';
 
         /**
          * _key
          * 
-         * @var     null|string (default: null)
          * @access  protected
+         * @var     null|string (default: null)
          */
         protected $_key = null;
 
         /**
          * _lastRemoteRequestHeaders
          * 
-         * @var     array (default: array())
          * @access  protected
+         * @var     array (default: array())
          */
         protected $_lastRemoteRequestHeaders = array();
 
         /**
          * _limit
          * 
-         * @var     int (default: 200)
          * @access  protected
+         * @var     int (default: 200)
          */
         protected $_limit = 200;
 
         /**
          * _logClosure
          * 
-         * @var     null|Closure (default: null)
          * @access  protected
+         * @var     null|Closure (default: null)
          */
         protected $_logClosure = null;
 
         /**
          * _maxPerPage
          * 
-         * @var     int (default: 200)
          * @access  protected
+         * @var     int (default: 200)
          */
         protected $_maxPerPage = 200;
 
         /**
          * _minHeight
          * 
-         * @var     int (default: 0)
          * @access  protected
+         * @var     int (default: 0)
          */
         protected $_minHeight = 0;
 
         /**
          * _minPerPage
          * 
-         * @var     int (default: 3)
          * @access  protected
+         * @var     int (default: 3)
          */
         protected $_minPerPage = 3;
 
         /**
          * _minWidth
          * 
-         * @var     int (default: 0)
          * @access  protected
+         * @var     int (default: 0)
          */
         protected $_minWidth = 0;
 
         /**
          * _order
          * 
-         * @var     string (default: 'popular')
          * @access  protected
+         * @var     string (default: 'popular')
          */
         protected $_order = 'popular';
 
         /**
          * _paths
          * 
-         * @var     array
          * @access  protected
+         * @var     array
          */
         protected $_paths = array(
             'search' => ''
@@ -128,24 +128,24 @@
         /**
          * _rateLimits
          * 
-         * @var     null|array
          * @access  protected
+         * @var     null|array
          */
         protected $_rateLimits = null;
 
         /**
          * _requestApproach
          * 
-         * @var     string (default: 'streams')
          * @access  protected
+         * @var     string (default: 'streams')
          */
         protected $_requestApproach = 'streams';
 
         /**
          * _requestTimeout
          * 
-         * @var     int (default: 10)
          * @access  protected
+         * @var     int (default: 10)
          */
         protected $_requestTimeout = 10;
 
