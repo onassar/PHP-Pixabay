@@ -114,8 +114,8 @@
          */
         public function __construct()
         {
-            // $this->setMaxPerPage(200);
-            $this->setMaxPerPage(16);
+            // $this->_maxPerPage = 200;
+            $this->_maxPerPage = 16;
             $this->_responseResultsIndex = 'hits';
         }
 
