@@ -7,7 +7,7 @@
     /**
      * Pixabay
      * 
-     * PHP wrapper for Pixabay
+     * PHP wrapper for Pixabay.
      * 
      * @link    https://pixabay.com/api/docs/
      * @link    https://github.com/onassar/PHP-Pixabay
@@ -67,7 +67,7 @@
         protected $_minHeight = 0;
 
         /**
-         * _minPerPage
+         * _minResultsPerPage
          * 
          * Defines the minimum number of results that need need to be retrieved
          * for requests. This is unique to Pixabay (at the time of
@@ -77,7 +77,7 @@
          * @access  protected
          * @var     int (default: 3)
          */
-        protected $_minPerPage = 3;
+        protected $_minResultsPerPage = 3;
 
         /**
          * _minWidth
@@ -114,19 +114,32 @@
          */
         public function __construct()
         {
-            // $this->_maxPerPage = 200;
-            $this->_maxPerPage = 16;
+            // $this->_maxResultsPerPage = 200;
+            $this->_maxResultsPerPage = 16;
             $this->_responseResultsIndex = 'hits';
         }
 
         /**
-         * _getQueryRequestData
+         * _getAuthRequestData
+         * 
+         * @access  protected
+         * @return  array
+         */
+        protected function _getAuthRequestData(): array
+        {
+            $key = $this->_apiKey;
+            $authRequestData = compact('key');
+            return $authRequestData;
+        }
+
+        /**
+         * _getSearchQueryRequestData
          * 
          * @access  protected
          * @param   string $query
          * @return  array
          */
-        protected function _getQueryRequestData(string $query): array
+        protected function _getSearchQueryRequestData(string $query): array
         {
             $responseGroup = 'image_details';
             if ($this->_hd === true) {
@@ -134,7 +147,6 @@
             }
             $queryRequestData = array(
                 'q' => $query,
-                'key' => $this->_apiKey,
                 'response_group' => $responseGroup,
                 'order' => $this->_order,
                 'safesearch' => 'true',
@@ -172,13 +184,18 @@
         /**
          * setLimit
          * 
+         * Sets the limit to be the higher of the $limit value passed in and the
+         * $minResultsPerPage value, since Pixabay has a minimum results per
+         * page value (which is 3).
+         * 
          * @access  public
          * @param   string $limit
          * @return  void
          */
         public function setLimit(int $limit): void
         {
-            $this->_limit = max($limit, $this->_minPerPage);
+            $minResultsPerPage = $this->_minResultsPerPage;
+            $this->_limit = max($limit, $minResultsPerPage);
         }
 
         /**
