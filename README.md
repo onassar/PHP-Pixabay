@@ -1,5 +1,5 @@
 # PHP-Pixabay
-PHP SDK for running queries against the millions of icons provided by
+PHP SDK for running queries against the millions of photos provided by
 [Pixabay](https://pixabay.com). Includes recursive searches.
 
 ### Supports
