@@ -67,7 +67,7 @@
         protected $_minHeight = 0;
 
         /**
-         * _minResultsPerPage
+         * _minResultsPerRequest
          * 
          * Defines the minimum number of results that need need to be retrieved
          * for requests. This is unique to Pixabay (at the time of
@@ -77,7 +77,7 @@
          * @access  protected
          * @var     int (default: 3)
          */
-        protected $_minResultsPerPage = 3;
+        protected $_minResultsPerRequest = 3;
 
         /**
          * _minWidth
@@ -114,8 +114,8 @@
          */
         public function __construct()
         {
-            // $this->_maxResultsPerPage = 200;
-            $this->_maxResultsPerPage = 16;
+            // $this->_maxResultsPerRequest = 200;
+            $this->_maxResultsPerRequest = 16;
             $this->_responseResultsIndex = 'hits';
         }
 
@@ -123,9 +123,10 @@
          * _getAuthRequestData
          * 
          * @access  protected
+         * @param   string $requestType
          * @return  array
          */
-        protected function _getAuthRequestData(): array
+        protected function _getAuthRequestData(string $requestType): array
         {
             $key = $this->_apiKey;
             $authRequestData = compact('key');
@@ -185,7 +186,7 @@
          * setLimit
          * 
          * Sets the limit to be the higher of the $limit value passed in and the
-         * $minResultsPerPage value, since Pixabay has a minimum results per
+         * $minResultsPerRequest value, since Pixabay has a minimum results per
          * page value (which is 3).
          * 
          * @access  public
@@ -194,8 +195,8 @@
          */
         public function setLimit(int $limit): void
         {
-            $minResultsPerPage = $this->_minResultsPerPage;
-            $this->_limit = max($limit, $minResultsPerPage);
+            $minResultsPerRequest = $this->_minResultsPerRequest;
+            $this->_limit = max($limit, $minResultsPerRequest);
         }
 
         /**
