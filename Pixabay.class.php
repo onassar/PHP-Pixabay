@@ -104,8 +104,7 @@
          */
         public function __construct()
         {
-            // $this->_maxResultsPerRequest = 200;
-            $this->_maxResultsPerRequest = 16;
+            $this->_maxResultsPerRequest = 200;
             $this->_responseResultsIndex = 'hits';
         }
 
