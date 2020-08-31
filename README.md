@@ -1,20 +1,24 @@
 # PHP-Pixabay
+PHP SDK for running queries against the millions of icons provided by
+[Pixabay](https://pixabay.com). Includes recursive searches.
 
-Simple PHP wrapper for Pixabay's API, using `file_get_contents` and streams
+### Supports
+- Searches
 
-### Sample Call
-
+### Sample Search
 ``` php
-<?php
-    require_once '/path/to/Pixabay.class.php';
-    $username  = '*****';
-    $key = '*****';
-    $pixabay = new Pixabay($username, $key);
-    $pixabay->setMinWidth(1600);
-    $pixabay->setPhotosPerPage(100);
-    $pixabay->setHD(true);
-    $photos = $pixabay->query('elephants');
-    print_r($photos);
-    exit(0);
-
+$client = new onassar\Pixabay\Pixabay();
+$client->setAPIKey('***');
+$client->setLimit(10);
+$client->setOffset(0);
+$client->setHD(true);
+$client->setMinWidth(1600);
+$client->setMinHeight(400);
+$results = $client->search('love') ?? array();
+print_r($results);
+exit(0);
 ```
+
+### Note
+Requires
+[PHP-RemoteResources](https://github.com/onassar/PHP-RemoteResources).
