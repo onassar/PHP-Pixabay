@@ -9,8 +9,8 @@
      * 
      * PHP wrapper for Pixabay.
      * 
-     * @link    https://pixabay.com/api/docs/
      * @link    https://github.com/onassar/PHP-Pixabay
+     * @link    https://pixabay.com/api/docs/
      * @author  Oliver Nassar <onassar@gmail.com>
      * @extends RemoteRequests\Base
      */
