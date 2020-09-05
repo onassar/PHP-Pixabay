@@ -5,7 +5,7 @@
     use onassar\RemoteRequests;
 
     /**
-     * Pixabay
+     * Base
      * 
      * PHP wrapper for Pixabay.
      * 
@@ -14,7 +14,7 @@
      * @author  Oliver Nassar <onassar@gmail.com>
      * @extends RemoteRequests\Base
      */
-    class Pixabay extends RemoteRequests\Base
+    class Base extends RemoteRequests\Base
     {
         /**
          * Traits
